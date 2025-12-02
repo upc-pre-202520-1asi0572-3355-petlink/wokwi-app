@@ -1,7 +1,8 @@
 #include "HeartRateLog.h"
 
 HeartRateLog* HeartRateLog::instance = nullptr;
-HeartRateLog::HeartRateLog() {}
+
+HeartRateLog::HeartRateLog() : deviceId("") {}
 
 HeartRateLog* HeartRateLog::getInstance() {
     if (instance == nullptr) {
@@ -18,10 +19,10 @@ int HeartRateLog::getHeartRate() {
     return heartRate;
 }
 
-void HeartRateLog::setSmartBandId(int id) {
-    smartBandId = id;
+void HeartRateLog::setDeviceId(const char* id) {
+    deviceId = id;
 }
 
-int HeartRateLog::getSmartBandId() {
-    return smartBandId;
+const char* HeartRateLog::getDeviceId() {
+    return deviceId;
 }

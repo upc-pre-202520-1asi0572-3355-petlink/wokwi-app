@@ -1,23 +1,23 @@
-#ifndef WIFI_BACKEND_MANAGER_H
-#define WIFI_BACKEND_MANAGER_H
+#ifndef EDGE_SERVICE_CLIENT_H
+#define EDGE_SERVICE_CLIENT_H
 
 #include <WiFi.h>
 #include <HTTPClient.h>
 
 class EdgeServiceClient {
-  private:
+private:
     HTTPClient client_http;
     const char* ssid;
     const char* password;
     const char* backendUrl;
-    int smartBandId;
+    const char* deviceId;  // 🔧 Cambiado de int a const char*
 
-  public:
+public:
     EdgeServiceClient();
     void connectWifi();
     void sendHeartRateData(int heartRate);
     bool isConnected();
-    void setSmartBandId(int id);
+    void setDeviceId(const char* id);  // 🔧 Cambiado de int a const char*
 };
 
-#endif
+#endif // EDGE_SERVICE_CLIENT_H

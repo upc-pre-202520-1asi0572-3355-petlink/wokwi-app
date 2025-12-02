@@ -8,16 +8,19 @@ private:
     HeartRateLog();
     HeartRateLog(const HeartRateLog&) = delete;
     HeartRateLog& operator=(const HeartRateLog&) = delete;
+    
     static HeartRateLog* instance;
     int heartRate;
-    int smartBandId;
+    const char* deviceId;  // 🔧 Cambiado de smartBandId (int) a deviceId (const char*)
 
 public:
     static HeartRateLog* getInstance();
+    
     void setHeartRate(int rate);
     int getHeartRate();
-    void setSmartBandId(int id);
-    int getSmartBandId();
+    
+    void setDeviceId(const char* id);
+    const char* getDeviceId();
 };
 
-#endif
+#endif // HEART_RATE_LOG_H

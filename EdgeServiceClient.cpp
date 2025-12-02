@@ -1,16 +1,19 @@
 #include "EdgeServiceClient.h"
 #include "HeartRateLog.h"
 #include "config.h"
-
 #include <time.h> 
 
 EdgeServiceClient::EdgeServiceClient()
-  : ssid(WIFI_SSID), password(WIFI_PASSWORD), backendUrl(EDGE_BACKEND_URL), smartBandId(SMART_BAND_ID) {}
+  : ssid(WIFI_SSID), 
+    password(WIFI_PASSWORD), 
+    backendUrl(EDGE_BACKEND_URL),
+    deviceId(DEVICE_ID) {}  // 🔧 Usar DEVICE_ID desde config.h
 
 void EdgeServiceClient::connectWifi() {
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
-    Serial.print("Connecting to WiFi");
+    
+    Serial.print("🔌 Conectando a WiFi");
     int attempts = 0;
     while (WiFi.status() != WL_CONNECTED && attempts < 20) {
         Serial.print(".");
@@ -18,57 +21,65 @@ void EdgeServiceClient::connectWifi() {
         attempts++;
     }
     Serial.println();
+    
     if(WiFi.status() == WL_CONNECTED) {
-        Serial.print("Connected. IP address: ");
+        Serial.println("✅ WiFi conectado");
+        Serial.print("   IP: ");
         Serial.println(WiFi.localIP());
         
-        //Configurar NTP para obtener tiempo real
+        // Configurar NTP para obtener tiempo real
         configTime(0, 0, "pool.ntp.org", "time.nist.gov");
-        Serial.println("NTP time configured");
+        Serial.println("🕐 NTP configurado\n");
     } else {
-        Serial.println("Failed to connect to WiFi");
+        Serial.println("❌ Error: No se pudo conectar a WiFi\n");
     }
 }
 
-void EdgeServiceClient::setSmartBandId(int id) {
-    smartBandId = id;
+void EdgeServiceClient::setDeviceId(const char* id) {
+    deviceId = id;
 }
 
-//FUNCIÓN MODIFICADA
 void EdgeServiceClient::sendHeartRateData(int heartRate) {
     if (!isConnected()) {
-        Serial.println("WiFi not connected. Reconnecting...");
+        Serial.println("⚠️  WiFi desconectado. Reconectando...");
         connectWifi();
+        if (!isConnected()) {
+            Serial.println("❌ No se pudo enviar datos: Sin conexión WiFi\n");
+            return;
+        }
     }
 
     HeartRateLog* heartRateLog = HeartRateLog::getInstance();
     heartRateLog->setHeartRate(heartRate);
-    heartRateLog->setSmartBandId(smartBandId);
+    heartRateLog->setDeviceId(deviceId);
     
     // ============================================
-    // NUEVO FORMATO JSON
+    // OBTENER TIMESTAMP EN FORMATO ISO 8601
     // ============================================
-    
-    // Obtener timestamp en formato ISO 8601
     time_t now = time(nullptr);
     struct tm timeinfo;
     gmtime_r(&now, &timeinfo);
     char timestamp[30];
     strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%SZ", &timeinfo);
     
-    // Crear device_id con formato: ESP32-<smartBandId>
-    String deviceId = "ESP32-(" + String(heartRateLog->getSmartBandId()) + ")";
-    
-    // Construir JSON con formato requerido:
-    // { "device_id":"<id>", "timestamp":"<ISO>", "bpm":<valor> }
+    // ============================================
+    // CONSTRUIR JSON EN FORMATO REQUERIDO
+    // {
+    //   "device_id": "string",
+    //   "timestamp": "string",  
+    //   "bpm": 0
+    // }
+    // ============================================
     String jsonData = "{";
-    jsonData += "\"device_id\":\"" + deviceId + "\",";
+    jsonData += "\"device_id\":\"" + String(heartRateLog->getDeviceId()) + "\",";
     jsonData += "\"timestamp\":\"" + String(timestamp) + "\",";
     jsonData += "\"bpm\":" + String(heartRateLog->getHeartRate()); 
     jsonData += "}";
 
-    Serial.println("\n📤 Sending data to backend:");
-    Serial.println("URL: " + String(backendUrl));
+    Serial.println("------------------------------------");
+    Serial.println("📤 ENVIANDO DATOS AL BACKEND");
+    Serial.println("------------------------------------");
+    Serial.println("URL:  " + String(backendUrl));
     Serial.println("JSON: " + jsonData);
 
     client_http.begin(backendUrl);
@@ -78,16 +89,24 @@ void EdgeServiceClient::sendHeartRateData(int heartRate) {
 
     if (httpCode > 0) {
         String payload = client_http.getString();
-        Serial.println("✅ Status code: " + String(httpCode));
-        Serial.println("Response: " + payload.substring(0, 200)); // Primeros 200 caracteres
+        Serial.println("✅ Estado: " + String(httpCode));
+        
+        // Mostrar respuesta (limitada a 200 caracteres)
+        if (payload.length() > 200) {
+            Serial.println("📥 Respuesta: " + payload.substring(0, 200) + "...");
+        } else {
+            Serial.println("📥 Respuesta: " + payload);
+        }
     } else {
-        Serial.println("❌ Error sending data to backend");
-        Serial.println("Error: " + client_http.errorToString(httpCode));
+        Serial.println("❌ Error al enviar datos");
+        Serial.println("   Código: " + String(httpCode));
+        Serial.println("   Detalle: " + client_http.errorToString(httpCode));
     }
+    Serial.println("------------------------------------\n");
 
     client_http.end();
 }
 
 bool EdgeServiceClient::isConnected() {
-  return WiFi.status() == WL_CONNECTED;
+    return WiFi.status() == WL_CONNECTED;
 }
