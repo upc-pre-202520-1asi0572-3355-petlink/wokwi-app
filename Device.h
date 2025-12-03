@@ -32,6 +32,7 @@ private:
     void controlLeds(HeartRateStatus status);
     void displayHeartRateInfo(int bpm, HeartRateStatus status);
     void testLeds();
+    void sendData(HeartRateStatus status, int passTime, int heartRate);
 };
 
 #endif // DEVICE_H

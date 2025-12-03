@@ -10,12 +10,12 @@
 // ============================================
 // CONFIGURACIÓN EDGE SERVICE
 // ============================================
-#define EDGE_BACKEND_URL "https://jsonplaceholder.typicode.com/posts"
+#define EDGE_BACKEND_URL "https://petlink-backend-3.onrender.com/api/sensor/heartbeat"
 
 // ============================================
 // IDENTIFICACIÓN DEL DISPOSITIVO
 // ============================================
-#define DEVICE_ID "COLLAR-001"  // 🔧 Variable de entorno para device_id
+#define DEVICE_ID "ESP32-(1)"  // 
 
 // ============================================
 // CONFIGURACIÓN DE PINES
@@ -57,7 +57,7 @@
 // ============================================
 // PARÁMETROS DE SIMULACIÓN
 // ============================================
-#define SIMULATION_UPDATE_INTERVAL 500 // ms entre actualizaciones
+#define SIMULATION_UPDATE_INTERVAL 200 // ms entre actualizaciones
 
 // ============================================
 // CONVERSIÓN ADC A VOLTAJE
@@ -68,6 +68,6 @@
 // ============================================
 // CONFIGURACIÓN DE ENVÍO DE DATOS
 // ============================================
-#define DATA_SEND_INTERVAL 2000  // ms entre envíos al backend
+#define DATA_SEND_INTERVAL 10000  // ms entre envíos al backend
 
 #endif // CONFIG_H

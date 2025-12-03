@@ -60,12 +60,19 @@ void Device::loop() {
     
     // Enviar datos al backend cada DATA_SEND_INTERVAL
     unsigned long currentTime = millis();
-    if (currentTime - lastSendTime >= DATA_SEND_INTERVAL) {
-        sendDataToBackend(heartRate);
-        lastSendTime = currentTime;
-    }
-    
+    sendData(status, currentTime-lastSendTime, heartRate);
+    lastSendTime = currentTime;
+        
     delay(500);
+}
+
+void Device::sendData(HeartRateStatus status, int passTime, int heartRate){
+    if(status == CRITICAL_LOW || status == CRITICAL_HIGH){
+        sendDataToBackend(heartRate);
+    }
+    if (passTime >= DATA_SEND_INTERVAL){
+        sendDataToBackend(heartRate);
+    }
 }
 
 void Device::sendDataToBackend(int heartRate) {
