@@ -1,6 +1,6 @@
 # 🐾 PetLink - Sistema IoT de Monitoreo Cardíaco Veterinario
 ## Enlace al proyecto Wokwi
-[![Wokwi Simulation](https://yt3.googleusercontent.com/ytc/AIdro_lAMS2z_YWKi9GHoDCJwdFKeXu1N1uyiO9Qwed1PB90=s900-c-k-c0x00ffffff-no-rj)](https://wokwi.com/projects/446707706509743105)
+[![Wokwi Simulation](https://avatars.githubusercontent.com/u/56967200?s=280&v=4)](https://wokwi.com/projects/446707706509743105)
 
 ## 📋 Descripción
 Sistema de monitoreo en tiempo real del ritmo cardíaco de mascotas durante fase de internamiento veterinario, utilizando collares IoT con ESP32 y simulación en Wokwi.
